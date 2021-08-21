@@ -47,7 +47,7 @@
       <JFXTextField fx:id="txtCustomerAddress" labelFloat="true" layoutX="17.0" layoutY="212.0" prefHeight="28.0" prefWidth="615.0" promptText="Customer Address :" />
       <JFXButton id="btnSave" fx:id="btnSave" layoutX="246.0" layoutY="278.0" onAction="#btnSave_OnAction" prefHeight="28.0" prefWidth="74.0" style="-fx-cursor: hand;" text="Save" />
       <JFXButton id="btnDelete" fx:id="btnDelete" layoutX="330.0" layoutY="278.0" onAction="#btnDelete_OnAction" prefHeight="28.0" prefWidth="74.0" style="-fx-cursor: hand;" text="Delete" />
-      <TableView fx:id="tblCustomers" layoutX="22.0" layoutY="316.0" prefHeight="285.0" prefWidth="615.0">
+      <TableView fx:id="tblCustomers" layoutX="22.0" layoutY="316.0" prefHeight="285.0" prefWidth="615.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0">
         <columns>
           <TableColumn prefWidth="97.0" text="Customer ID" />
           <TableColumn prefWidth="230.0" text="Customer Name" />
