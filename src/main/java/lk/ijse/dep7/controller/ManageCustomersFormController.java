@@ -27,10 +27,14 @@ public class ManageCustomersFormController {
     public JFXTextField txtCustomerAddress;
     public TableView<CustomerTM> tblCustomers;
 
-    public void initialize(){
+    public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
         tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
         tblCustomers.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("address"));
+
+        txtCustomerId.setEditable(false);
+        btnSave.setDisable(true);
+        btnDelete.setDisable(true);
     }
 
     @FXML
@@ -41,11 +45,18 @@ public class ManageCustomersFormController {
         Stage primaryStage = (Stage) (this.root.getScene().getWindow());
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
-        Platform.runLater(()->primaryStage.sizeToScene());
+        Platform.runLater(() -> primaryStage.sizeToScene());
     }
 
 
     public void btnAddNew_OnAction(ActionEvent actionEvent) {
+        txtCustomerId.clear();
+        txtCustomerId.setText(generateNewId());
+        txtCustomerName.clear();
+        txtCustomerAddress.clear();
+        txtCustomerName.requestFocus();
+        btnSave.setDisable(false);
+
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
@@ -53,4 +64,14 @@ public class ManageCustomersFormController {
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
     }
+
+    private String generateNewId() {
+        if (tblCustomers.getItems().isEmpty()) {
+            return "C001";
+        } else {
+            /* Todo : generate new id when there are customers */
+            throw new UnsupportedOperationException("Yet to implement");
+        }
+    }
+
 }
