@@ -43,7 +43,8 @@ public class ManageCustomersFormController {
                 txtCustomerId.setText(newValue.getId());
                 txtCustomerName.setText(newValue.getName());
                 txtCustomerAddress.setText(newValue.getAddress());
-                btnSave.setText("Update");
+                btnSave.setDisable(false);
+
             }
             tblCustomers.refresh();
 
@@ -77,10 +78,11 @@ public class ManageCustomersFormController {
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
+        String id = txtCustomerId.getText();
+        String name = txtCustomerName.getText();
+        String address = txtCustomerAddress.getText();
+
         if (btnSave.getText().equals("Save")) {
-            String id = txtCustomerId.getText();
-            String name = txtCustomerName.getText();
-            String address = txtCustomerAddress.getText();
 
             if (!name.matches("[A-Za-z ]+")) {
                 new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
@@ -93,10 +95,24 @@ public class ManageCustomersFormController {
             }
             /* Todo: We need to save this in our DB first*/
             tblCustomers.getItems().add(new CustomerTM(id, name, address));
-            btnAddNewCustomer.fire();
-        } else if (btnSave.getText().equals("Update")) {
 
+        } else if (btnSave.getText().equals("Update")) {
+            CustomerTM selectedCustomer = tblCustomers.getSelectionModel().getSelectedItem();
+
+            if (!name.matches("[A-Za-z ]+")) {
+                new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
+                txtCustomerName.requestFocus();
+                return;
+            } else if (!address.matches(".{3,}")) {
+                new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
+                txtCustomerAddress.requestFocus();
+                return;
+            }
+            selectedCustomer.setName(name);
+            selectedCustomer.setAddress(address);
+            tblCustomers.refresh();
         }
+        btnAddNewCustomer.fire();
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
