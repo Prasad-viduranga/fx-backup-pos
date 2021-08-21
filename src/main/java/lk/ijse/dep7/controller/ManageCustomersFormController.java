@@ -38,14 +38,17 @@ public class ManageCustomersFormController {
 
         tblCustomers.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             btnDelete.setDisable(newValue == null);
-            if (newValue!=null){
+            btnSave.setText(newValue != null ? "Update" : "Save");
+            if (newValue != null) {
                 txtCustomerId.setText(newValue.getId());
                 txtCustomerName.setText(newValue.getName());
                 txtCustomerAddress.setText(newValue.getAddress());
+                btnSave.setText("Update");
             }
             tblCustomers.refresh();
 
         });
+        txtCustomerAddress.setOnAction(event -> btnSave.fire());
     }
 
     @FXML
@@ -70,25 +73,30 @@ public class ManageCustomersFormController {
         txtCustomerName.requestFocus();
         btnSave.setDisable(false);
         tblCustomers.getSelectionModel().clearSelection();
+
     }
 
     public void btnSave_OnAction(ActionEvent actionEvent) {
-        String id = txtCustomerId.getText();
-        String name = txtCustomerName.getText();
-        String address = txtCustomerAddress.getText();
+        if (btnSave.getText().equals("Save")) {
+            String id = txtCustomerId.getText();
+            String name = txtCustomerName.getText();
+            String address = txtCustomerAddress.getText();
 
-        if (!name.matches("[A-Za-z ]+")) {
-            new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
-            txtCustomerName.requestFocus();
-            return;
-        } else if (!address.matches(".{3,}")) {
-            new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
-            txtCustomerAddress.requestFocus();
-            return;
+            if (!name.matches("[A-Za-z ]+")) {
+                new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
+                txtCustomerName.requestFocus();
+                return;
+            } else if (!address.matches(".{3,}")) {
+                new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
+                txtCustomerAddress.requestFocus();
+                return;
+            }
+            /* Todo: We need to save this in our DB first*/
+            tblCustomers.getItems().add(new CustomerTM(id, name, address));
+            btnAddNewCustomer.fire();
+        } else if (btnSave.getText().equals("Update")) {
+
         }
-        /* Todo: We need to save this in our DB first*/
-        tblCustomers.getItems().add(new CustomerTM(id, name, address));
-        btnAddNewCustomer.fire();
     }
 
     public void btnDelete_OnAction(ActionEvent actionEvent) {
@@ -99,7 +107,7 @@ public class ManageCustomersFormController {
         initUI();
     }
 
-    private void initUI(){
+    private void initUI() {
         txtCustomerId.clear();
         txtCustomerName.clear();
         txtCustomerAddress.clear();
