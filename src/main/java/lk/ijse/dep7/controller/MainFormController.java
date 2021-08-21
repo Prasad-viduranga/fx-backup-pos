@@ -111,7 +111,7 @@ public class MainFormController {
 
             switch(icon.getId()){
                 case "imgCustomer":
-                    root = FXMLLoader.load(this.getClass().getResource("/resources/view/manage-customers-form.fxml"));
+                    root = FXMLLoader.load(this.getClass().getResource("/view/manage-customers-form.fxml"));
                     break;
                 case "imgItem":
                     root = FXMLLoader.load(this.getClass().getResource("/view/manage-items-form.fxml"));

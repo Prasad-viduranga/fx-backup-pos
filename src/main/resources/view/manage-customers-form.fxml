@@ -38,7 +38,7 @@
             <Font name="Ubuntu" size="27.0" />
          </font>
       </Label>
-      <JFXButton id="btnAddNewCustomer" layoutX="518.0" layoutY="25.0" onAction="#btnAddNew_OnAction" prefHeight="35.0" prefWidth="122.0" style="-fx-cursor: hand;" text="+ New Customer" />
+      <JFXButton fx:id="btnAddNewCustomer" id="btnAddNewCustomer" layoutX="518.0" layoutY="25.0" onAction="#btnAddNew_OnAction" prefHeight="35.0" prefWidth="122.0" style="-fx-cursor: hand;" text="+ New Customer" />
       <JFXTextField fx:id="txtCustomerId" labelFloat="true" layoutX="17.0" layoutY="118.0" prefHeight="28.0" prefWidth="615.0" promptText="Customer ID :">
          <font>
             <Font name="Ubuntu" size="13.0" />
@@ -47,12 +47,12 @@
       <JFXTextField fx:id="txtCustomerAddress" labelFloat="true" layoutX="17.0" layoutY="212.0" prefHeight="28.0" prefWidth="615.0" promptText="Customer Address :" />
       <JFXButton id="btnSave" fx:id="btnSave" layoutX="246.0" layoutY="278.0" onAction="#btnSave_OnAction" prefHeight="28.0" prefWidth="74.0" style="-fx-cursor: hand;" text="Save" />
       <JFXButton id="btnDelete" fx:id="btnDelete" layoutX="330.0" layoutY="278.0" onAction="#btnDelete_OnAction" prefHeight="28.0" prefWidth="74.0" style="-fx-cursor: hand;" text="Delete" />
-      <TableView fx:id="tblCustomers" layoutX="22.0" layoutY="316.0" prefHeight="285.0" prefWidth="615.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0">
-        <columns>
-          <TableColumn prefWidth="97.0" text="Customer ID" />
-          <TableColumn prefWidth="230.0" text="Customer Name" />
+      <TableView fx:id="tblCustomers" layoutX="22.0" layoutY="316.0" prefHeight="285.0" prefWidth="615.0">
+         <columns>
+            <TableColumn prefWidth="97.0" text="Customer ID" />
+            <TableColumn prefWidth="230.0" text="Customer Name" />
             <TableColumn prefWidth="282.0" text="Customer Address" />
-        </columns>
+         </columns>
       </TableView>
    </children>
 </AnchorPane>

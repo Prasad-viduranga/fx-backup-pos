@@ -20,6 +20,7 @@ public class SearchOrdersFormController {
     public TextField txtSearch;
     public TableView tblOrders;
 
+
     @FXML
     private void navigateToHome(MouseEvent event) throws IOException {
         URL resource = this.getClass().getResource("/view/main-form.fxml");
@@ -28,7 +29,7 @@ public class SearchOrdersFormController {
         Stage primaryStage = (Stage) (this.root.getScene().getWindow());
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
-        Platform.runLater(()->primaryStage.sizeToScene());
+        Platform.runLater(() -> primaryStage.sizeToScene());
     }
 
     public void tblOrders_OnMouseClicked(MouseEvent mouseEvent) {
