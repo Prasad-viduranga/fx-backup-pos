@@ -15,7 +15,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lk.ijse.dep7.dbutils.SingleConnectionDataSource;
+import lk.ijse.dep7.dto.CustomerDTO;
+import lk.ijse.dep7.exception.DuplicateIdentifierException;
 import lk.ijse.dep7.exception.FailedOperationException;
+import lk.ijse.dep7.exception.NotFoundException;
 import lk.ijse.dep7.service.CustomerService;
 import lk.ijse.dep7.util.CustomerTM;
 
@@ -48,6 +51,8 @@ public class ManageCustomersFormController {
                 txtCustomerName.setText(newValue.getName());
                 txtCustomerAddress.setText(newValue.getAddress());
                 btnSave.setDisable(false);
+                txtCustomerName.setDisable(false);
+                txtCustomerAddress.setDisable(false);
 
             }
             tblCustomers.refresh();
@@ -73,7 +78,7 @@ public class ManageCustomersFormController {
             customerService.findAllCustomer().forEach(dto -> tblCustomers.getItems().add(new CustomerTM(dto.getId(), dto.getName(), dto.getAddress())));
 
         } catch (FailedOperationException e) {
-            new Alert(Alert.AlertType.ERROR,e.getMessage()).show();
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
             throw e;
         }
     }
@@ -103,50 +108,76 @@ public class ManageCustomersFormController {
 
     }
 
-    public void btnSave_OnAction(ActionEvent actionEvent) {
+    public void btnSave_OnAction(ActionEvent actionEvent) throws FailedOperationException {
         String id = txtCustomerId.getText();
         String name = txtCustomerName.getText();
         String address = txtCustomerAddress.getText();
+        try {
 
-        if (btnSave.getText().equals("Save")) {
+            if (btnSave.getText().equals("Save")) {
 
-            if (!name.matches("[A-Za-z ]+")) {
-                new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
-                txtCustomerName.requestFocus();
-                return;
-            } else if (!address.matches(".{3,}")) {
-                new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
-                txtCustomerAddress.requestFocus();
-                return;
+                if (!name.matches("[A-Za-z ]+")) {
+                    new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
+                    txtCustomerName.requestFocus();
+                    return;
+                } else if (!address.matches(".{3,}")) {
+                    new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
+                    txtCustomerAddress.requestFocus();
+                    return;
+                }
+
+                try {
+                    customerService.saveCustomer(new CustomerDTO(id, name, address));
+                } catch (DuplicateIdentifierException e) {
+                    new Alert(Alert.AlertType.ERROR, "Invalid ID").show();
+                }
+                tblCustomers.getItems().add(new CustomerTM(id, name, address));
+
+            } else if (btnSave.getText().equals("Update")) {
+                CustomerTM selectedCustomer = tblCustomers.getSelectionModel().getSelectedItem();
+
+                if (!name.matches("[A-Za-z ]+")) {
+                    new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
+                    txtCustomerName.requestFocus();
+                    return;
+                } else if (!address.matches(".{3,}")) {
+                    new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
+                    txtCustomerAddress.requestFocus();
+                    return;
+                }
+
+                try {
+                    selectedCustomer.setName(name);
+                    selectedCustomer.setAddress(address);
+                    customerService.updateCustomer(new CustomerDTO(id, name, address));
+                    tblCustomers.refresh();
+                } catch (NotFoundException e) {
+                    e.printStackTrace();
+                }
+
             }
-            /* Todo: We need to save this in our DB first*/
-            tblCustomers.getItems().add(new CustomerTM(id, name, address));
-
-        } else if (btnSave.getText().equals("Update")) {
-            CustomerTM selectedCustomer = tblCustomers.getSelectionModel().getSelectedItem();
-
-            if (!name.matches("[A-Za-z ]+")) {
-                new Alert(Alert.AlertType.ERROR, "Invalid Name").show();
-                txtCustomerName.requestFocus();
-                return;
-            } else if (!address.matches(".{3,}")) {
-                new Alert(Alert.AlertType.ERROR, "Address should  be at least 3 characters long").show();
-                txtCustomerAddress.requestFocus();
-                return;
-            }
-            selectedCustomer.setName(name);
-            selectedCustomer.setAddress(address);
-            tblCustomers.refresh();
+            btnAddNewCustomer.fire();
+        } catch (FailedOperationException e) {
+            new Alert(Alert.AlertType.ERROR,e.getMessage()).show();
+            throw e;
         }
-        btnAddNewCustomer.fire();
+
     }
 
-    public void btnDelete_OnAction(ActionEvent actionEvent) {
-        tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
-        tblCustomers.getSelectionModel().clearSelection();
-        tblCustomers.refresh();
+    public void btnDelete_OnAction(ActionEvent actionEvent) throws FailedOperationException {
+        try {
+            customerService.deleteCustomer(tblCustomers.getSelectionModel().getSelectedItem().getId());
+            tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
+            tblCustomers.getSelectionModel().clearSelection();
+            tblCustomers.refresh();
+            initUI();
 
-        initUI();
+        } catch (NotFoundException e) {
+            e.printStackTrace(); // Never happend with our UI design
+        } catch (FailedOperationException e) {
+            new Alert(Alert.AlertType.ERROR,e.getMessage()).show();
+            throw e;
+        }
     }
 
     private void initUI() {
