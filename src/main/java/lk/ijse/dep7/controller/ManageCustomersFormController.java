@@ -14,6 +14,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lk.ijse.dep7.dbutils.SingleConnectionDataSource;
+import lk.ijse.dep7.exception.FailedOperationException;
+import lk.ijse.dep7.service.CustomerService;
 import lk.ijse.dep7.util.CustomerTM;
 
 import java.io.IOException;
@@ -28,6 +31,7 @@ public class ManageCustomersFormController {
     public JFXTextField txtCustomerAddress;
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
+    private CustomerService customerService = new CustomerService(SingleConnectionDataSource.getInstance().getConnection());
 
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -50,6 +54,27 @@ public class ManageCustomersFormController {
 
         });
         txtCustomerAddress.setOnAction(event -> btnSave.fire());
+        loadAllCustomer();
+    }
+
+    private void loadAllCustomer() {
+        tblCustomers.getItems().clear();
+        try {
+//            Methhod 1
+//            List<CustomerDTO> allCustomer = customerService.findAllCustomer();
+//            for (CustomerDTO customer : allCustomer) {
+//                tblCustomers.getItems().add(new CustomerTM(customer.getId(), customer.getName(), customer.getAddress()));
+//            }
+//            Method 2
+//            List<CustomerTM> customers = customerService.findAllCustomer().stream().map(dto -> new CustomerTM(dto.getId(), dto.getName(), dto.getAddress())).collect(Collectors.toList());
+//            tblCustomers.setItems(FXCollections.observableList(customers));
+
+//            Method 3
+            customerService.findAllCustomer().forEach(dto -> tblCustomers.getItems().add(new CustomerTM(dto.getId(), dto.getName(), dto.getAddress())));
+
+        } catch (FailedOperationException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
