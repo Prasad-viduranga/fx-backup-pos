@@ -33,7 +33,7 @@ public class ManageCustomersFormController {
     public JFXButton btnAddNewCustomer;
     private CustomerService customerService = new CustomerService(SingleConnectionDataSource.getInstance().getConnection());
 
-    public void initialize() {
+    public void initialize() throws FailedOperationException {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
         tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
         tblCustomers.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("address"));
@@ -57,10 +57,10 @@ public class ManageCustomersFormController {
         loadAllCustomer();
     }
 
-    private void loadAllCustomer() {
+    private void loadAllCustomer() throws FailedOperationException {
         tblCustomers.getItems().clear();
         try {
-//            Methhod 1
+//            Method 1
 //            List<CustomerDTO> allCustomer = customerService.findAllCustomer();
 //            for (CustomerDTO customer : allCustomer) {
 //                tblCustomers.getItems().add(new CustomerTM(customer.getId(), customer.getName(), customer.getAddress()));
@@ -73,7 +73,8 @@ public class ManageCustomersFormController {
             customerService.findAllCustomer().forEach(dto -> tblCustomers.getItems().add(new CustomerTM(dto.getId(), dto.getName(), dto.getAddress())));
 
         } catch (FailedOperationException e) {
-            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR,e.getMessage()).show();
+            throw e;
         }
     }
 
