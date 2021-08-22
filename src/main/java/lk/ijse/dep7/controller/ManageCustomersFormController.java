@@ -57,8 +57,6 @@ public class ManageCustomersFormController {
                 txtCustomerAddress.setDisable(false);
 
             }
-            tblCustomers.refresh();
-
         });
         txtCustomerAddress.setOnAction(event -> btnSave.fire());
         loadAllCustomer();

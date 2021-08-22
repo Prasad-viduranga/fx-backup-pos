@@ -67,7 +67,6 @@ public class CustomerService {
             if (!existCustomer(id)) {
                 throw new NotFoundException("There is no such customer associated with the id" + id);
             }
-
             PreparedStatement pstmDeleteCustomer = connection.prepareStatement("DELETE FROM customer WHERE id=?");
             pstmDeleteCustomer.setString(1, id);
             pstmDeleteCustomer.executeUpdate();
