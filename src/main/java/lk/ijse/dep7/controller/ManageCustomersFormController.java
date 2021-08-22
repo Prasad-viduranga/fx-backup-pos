@@ -24,6 +24,8 @@ import lk.ijse.dep7.util.CustomerTM;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManageCustomersFormController {
     public AnchorPane root;
@@ -158,7 +160,7 @@ public class ManageCustomersFormController {
             }
             btnAddNewCustomer.fire();
         } catch (FailedOperationException e) {
-            new Alert(Alert.AlertType.ERROR,e.getMessage()).show();
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
             throw e;
         }
 
@@ -175,7 +177,7 @@ public class ManageCustomersFormController {
         } catch (NotFoundException e) {
             e.printStackTrace(); // Never happend with our UI design
         } catch (FailedOperationException e) {
-            new Alert(Alert.AlertType.ERROR,e.getMessage()).show();
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
             throw e;
         }
     }
@@ -193,15 +195,18 @@ public class ManageCustomersFormController {
     }
 
     private String generateNewId() {
+        int lastID = 0;
         if (tblCustomers.getItems().isEmpty()) {
             return "C001";
         } else {
-            CustomerTM lastCustomer = tblCustomers.getItems().get(tblCustomers.getItems().size() - 1);
-            String id = lastCustomer.getId();
-            String[] splitId = id.split("C");
-            int newId = Integer.parseInt(splitId[1]) + 1;
+            List<Integer> customers = new ArrayList<>();
+            for (int i = 0; i < tblCustomers.getItems().size(); i++) {
+                if (lastID < Integer.parseInt(tblCustomers.getItems().get(i).getId().split("C")[1])) {
+                    lastID = Integer.parseInt(tblCustomers.getItems().get(i).getId().split("C")[1]);
+                }
+            }
+            int newId = lastID + 1;
             return String.format("C%03d", newId);
-
         }
     }
 }
