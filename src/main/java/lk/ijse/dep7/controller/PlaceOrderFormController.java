@@ -159,6 +159,25 @@ public class PlaceOrderFormController {
 
     public void btnAdd_OnAction(ActionEvent actionEvent) {
 
+
+        String code = cmbItemCode.getSelectionModel().getSelectedItem();
+        String description = txtDescription.getText();
+        int qty = Integer.parseInt(txtQty.getText());
+        BigDecimal unitPrice = new BigDecimal(txtUnitPrice.getText());
+        BigDecimal total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
+
+        for (OrderDetailsTM orderDetailsTM : tblOrderDetails.getItems()) {
+            if (orderDetailsTM.getCode().equals(code)) {
+                qty = orderDetailsTM.getQty() + qty;
+                total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
+                orderDetailsTM.setQty(qty);
+            }
+
+            tblOrderDetails.refresh();
+            cmbItemCode.requestFocus();
+            initUI();
+            return;
+        }
         if (!txtQty.getText().matches("\\d+") || Integer.parseInt(txtQty.getText()) <= 0
                 || Integer.parseInt(txtQty.getText()) > Integer.parseInt(txtQtyOnHand.getText())) {
             new Alert(Alert.AlertType.ERROR, "Invalid qty").show();
@@ -166,12 +185,6 @@ public class PlaceOrderFormController {
             txtQty.selectAll();
             return;
         }
-        String code = cmbItemCode.getSelectionModel().getSelectedItem();
-        String description = txtDescription.getText();
-        int qty = Integer.parseInt(txtQty.getText());
-        BigDecimal unitPrice = new BigDecimal(txtUnitPrice.getText());
-        BigDecimal total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
-
         tblOrderDetails.getItems().add(new OrderDetailsTM(code, description, qty, unitPrice, total));
         initUI();
     }
