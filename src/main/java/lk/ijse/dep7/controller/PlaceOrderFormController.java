@@ -69,7 +69,9 @@ public class PlaceOrderFormController {
         TableColumn<OrderDetailsTM, Button> lastCol = (TableColumn<OrderDetailsTM, Button>) tblOrderDetails.getColumns().get(5);
         lastCol.setCellValueFactory(param -> {
             Button btnDelete = new Button("Delete");
-
+            btnDelete.setOnAction(event -> {
+                tblOrderDetails.getItems().remove(param.getValue());
+            });
             return new ReadOnlyObjectWrapper<>(btnDelete);
         });
 
@@ -80,6 +82,9 @@ public class PlaceOrderFormController {
         loadAllCustomer();
         loadAllItem();
         txtCustomerName.setEditable(false);
+        txtDescription.setFocusTraversable(false);
+        txtUnitPrice.setFocusTraversable(false);
+        txtQtyOnHand.setFocusTraversable(false);
         txtDescription.setEditable(false);
         txtQtyOnHand.setEditable(false);
         txtUnitPrice.setEditable(false);
