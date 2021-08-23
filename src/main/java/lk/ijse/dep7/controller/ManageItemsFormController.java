@@ -70,7 +70,7 @@ public class ManageItemsFormController {
             }
         });
 
-
+        txtUnitPrice.setOnAction(event -> btnSave.fire());
         loadAllItem();
 
     }
@@ -79,7 +79,7 @@ public class ManageItemsFormController {
         try {
             List<ItemDTO> allItem = itemService.findAllItem();
             for (ItemDTO item : allItem) {
-                tblItems.getItems().add(new ItemTM(item.getCode(), item.getDescription(), String.valueOf(item.getQty()), String.valueOf(item.getUnitPrice())));
+                tblItems.getItems().add(new ItemTM(item.getCode(), item.getDescription(), String.valueOf(item.getQty()), String.valueOf(item.getUnitPrice().setScale(2))));
             }
 
         } catch (FailedOperationException e) {
@@ -129,10 +129,24 @@ public class ManageItemsFormController {
     public void btnSave_OnAction(ActionEvent actionEvent) throws FailedOperationException {
         String code = txtCode.getText();
         String description = txtDescription.getText();
-        int qty = Integer.parseInt(txtQtyOnHand.getText());
-        BigDecimal unitPrice = BigDecimal.valueOf(Float.parseFloat(txtUnitPrice.getText()));
-        try {
 
+        if (description.matches("[A-Za-z0-9 ]+")){
+            new Alert(Alert.AlertType.ERROR,"Invalid description").show();
+            txtDescription.requestFocus();
+            return;
+        }else if (txtQtyOnHand.getText().matches("^\\d+$")){
+            new Alert(Alert.AlertType.ERROR,"Invalid description").show();
+            txtDescription.requestFocus();
+            return;
+        }else if (txtUnitPrice.getText().matches("^[0-9 ]+[.]?[0-9]*$")){
+            new Alert(Alert.AlertType.ERROR,"Invalid description").show();
+            txtDescription.requestFocus();
+            return;
+        }
+        int qty = Integer.parseInt(txtQtyOnHand.getText());
+        BigDecimal unitPrice = BigDecimal.valueOf(Float.parseFloat(txtUnitPrice.getText())).setScale(2);
+
+        try {
             if (btnSave.getText().equals("Save")) {
                 itemService.saveItem(new ItemDTO(code, description, qty, unitPrice));
                 tblItems.getItems().add(new ItemTM(code, description, String.valueOf(qty), String.valueOf(unitPrice)));
