@@ -47,7 +47,7 @@
       <JFXTextField fx:id="txtQtyOnHand" labelFloat="true" layoutX="17.0" layoutY="226.0" prefHeight="28.0" prefWidth="161.0" promptText="Qty. on Hand" />
       <JFXTextField fx:id="txtUnitPrice" labelFloat="true" layoutX="195.0" layoutY="226.0" prefHeight="28.0" prefWidth="161.0" promptText="Unit Price" />
       <JFXTextField fx:id="txtQty" labelFloat="true" layoutX="370.0" layoutY="226.0" onAction="#txtQty_OnAction" prefHeight="28.0" prefWidth="161.0" promptText="Qty." />
-      <JFXButton id="btnSave" fx:id="btnSave" layoutX="558.0" layoutY="226.0" onAction="#btnAdd_OnAction" prefHeight="28.0" prefWidth="74.0" style="-fx-cursor: hand;" text="Add" />
+      <JFXButton id="btnAdd" fx:id="btnAdd" layoutX="558.0" layoutY="226.0" onAction="#btnAdd_OnAction" prefHeight="28.0" prefWidth="74.0" style="-fx-cursor: hand;" text="Add" />
       <TableView fx:id="tblOrderDetails" layoutX="22.0" layoutY="280.0" prefHeight="189.0" prefWidth="615.0">
          <columns>
             <TableColumn prefWidth="77.0" text="Code" />
