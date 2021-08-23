@@ -20,7 +20,7 @@ public class ItemService {
 
     }
 
-    private boolean exist(String code) throws SQLException {
+    private boolean existItem(String code) throws SQLException {
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM item WHERE code=?");
         pstm.setString(1, code);
         ResultSet rst = pstm.executeQuery();
@@ -29,7 +29,7 @@ public class ItemService {
 
     public void saveItem(ItemDTO itemDTO) throws DuplicateIdentifierException {
         try {
-            if (exist(itemDTO.getCode())) {
+            if (existItem(itemDTO.getCode())) {
                 throw new DuplicateIdentifierException("Invalid Item code" + itemDTO.getCode());
             }
             PreparedStatement pstm = connection.prepareStatement("INSERT INTO item(code,description,qty_on_hand,unit_price) VALUES (?,?,?,?)");
@@ -62,7 +62,7 @@ public class ItemService {
 
     public void deleteItem(String code) throws FailedOperationException, NotFoundException {
         try {
-            if (!exist(code)) {
+            if (!existItem(code)) {
                 throw new NotFoundException("There is no such item associated with the id" + code);
             }
             PreparedStatement pstm = connection.prepareStatement("DELETE FROM item WHERE code=?");
@@ -76,12 +76,13 @@ public class ItemService {
 
     public ItemDTO findItem(String code) throws FailedOperationException, NotFoundException {
         try {
-            if (!exist(code)) {
+            if (!existItem(code)) {
                 throw new NotFoundException("There is no such item with " + code);
             }
             PreparedStatement pstm = connection.prepareStatement("SELECT * FROM item WHERE code=?");
             pstm.setString(1, code);
             ResultSet rst = pstm.executeQuery();
+            rst.next();
             return new ItemDTO(rst.getString(1), rst.getString(2), rst.getInt(4), rst.getBigDecimal(3));
 
 

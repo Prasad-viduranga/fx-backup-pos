@@ -13,6 +13,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Customer Service API
+ *
+ * @author prasad
+ */
 public class CustomerService {
 
     private Connection connection = SingleConnectionDataSource.getInstance().getConnection();
@@ -20,6 +25,13 @@ public class CustomerService {
     public CustomerService(Connection connection) {
 
     }
+
+    /**
+     * Invake to save a new customer
+     * @param customer
+     * @throws DuplicateIdentifierException
+     * @throws FailedOperationException
+     */
 
     public void saveCustomer(CustomerDTO customer) throws DuplicateIdentifierException, FailedOperationException {
         try {
