@@ -129,7 +129,7 @@ public class PlaceOrderFormController {
 //                    Method 2
                     Optional<OrderDetailsTM> optOrderDetail = tblOrderDetails.getItems().stream().filter(details -> details.getCode().equals(newValue)).findFirst();
 
-                    txtQtyOnHand.setText((optOrderDetail.isPresent() ? itemService.findItem(newValue).getQty() - optOrderDetail.get().getQty() : itemService.findItem(newValue).getQty()) +"");
+                    txtQtyOnHand.setText((optOrderDetail.isPresent() ? itemService.findItem(newValue).getQty() - optOrderDetail.get().getQty() : itemService.findItem(newValue).getQty()) + "");
 
 
                 } catch (NotFoundException e) {
@@ -142,6 +142,17 @@ public class PlaceOrderFormController {
             }
         });
 
+        tblOrderDetails.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                btnAdd.setText("Update");
+                cmbItemCode.setDisable(true);
+                cmbItemCode.setValue(newValue.getCode());
+                txtQtyOnHand.setText(Integer.parseInt(txtQtyOnHand.getText()) + newValue.getQty() + "");
+                txtQty.setText(newValue.getQty() + "");
+
+            }
+        });
+
     }
 
     private void initUI() {
@@ -151,6 +162,9 @@ public class PlaceOrderFormController {
         txtUnitPrice.clear();
         txtQty.clear();
         btnAdd.setDisable(true);
+        tblOrderDetails.getSelectionModel().clearSelection();
+        cmbCustomerId.requestFocus();
+        cmbItemCode.setDisable(false);
 
     }
 
@@ -189,6 +203,15 @@ public class PlaceOrderFormController {
             new Alert(Alert.AlertType.ERROR, "Invalid qty").show();
             txtQty.requestFocus();
             txtQty.selectAll();
+            return;
+        }
+        if (btnAdd.getText().equals("Update")) {
+
+            total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
+            tblOrderDetails.getSelectionModel().getSelectedItem().setQty(qty);
+            tblOrderDetails.getSelectionModel().getSelectedItem().setTotal(total);
+            tblOrderDetails.refresh();
+            initUI();
             return;
         }
 
