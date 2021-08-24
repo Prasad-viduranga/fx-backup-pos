@@ -73,6 +73,7 @@ public class PlaceOrderFormController {
             btnDelete.setOnAction(event -> {
                 tblOrderDetails.getItems().remove(param.getValue());
                 initUI();
+                setOrDisablePlaceOrder();
             });
             return new ReadOnlyObjectWrapper<>(btnDelete);
         });
@@ -106,6 +107,7 @@ public class PlaceOrderFormController {
                     throw new RuntimeException(e);
                 }
             }
+            setOrDisablePlaceOrder();
         });
 
         cmbItemCode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -170,6 +172,10 @@ public class PlaceOrderFormController {
 
     }
 
+    private void setOrDisablePlaceOrder() {
+        btnPlaceOrder.setDisable(!(cmbCustomerId.getSelectionModel().getSelectedItem() != null && !tblOrderDetails.getItems().isEmpty()));
+    }
+
     private void initUI() {
         cmbItemCode.getSelectionModel().clearSelection();
         txtDescription.clear();
@@ -205,7 +211,6 @@ public class PlaceOrderFormController {
     }
 
     public void btnAdd_OnAction(ActionEvent actionEvent) {
-
 
         String code = cmbItemCode.getSelectionModel().getSelectedItem();
         String description = txtDescription.getText();
@@ -246,6 +251,7 @@ public class PlaceOrderFormController {
 
         tblOrderDetails.getItems().add(new OrderDetailsTM(code, description, qty, unitPrice, total));
         initUI();
+        setOrDisablePlaceOrder();
     }
 
     public void txtQty_OnAction(ActionEvent actionEvent) {
