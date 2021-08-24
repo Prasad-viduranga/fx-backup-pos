@@ -12,6 +12,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -29,6 +31,8 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
+
+import static javafx.scene.input.KeyEvent.KEY_PRESSED;
 
 public class PlaceOrderFormController {
 
@@ -72,6 +76,7 @@ public class PlaceOrderFormController {
             Button btnDelete = new Button("Delete");
             btnDelete.setOnAction(event -> {
                 tblOrderDetails.getItems().remove(param.getValue());
+                initUI();
             });
             return new ReadOnlyObjectWrapper<>(btnDelete);
         });
@@ -150,8 +155,19 @@ public class PlaceOrderFormController {
                 txtQtyOnHand.setText(Integer.parseInt(txtQtyOnHand.getText()) + newValue.getQty() + "");
                 txtQty.setText(newValue.getQty() + "");
 
+            } else {
+                btnAdd.setText("Add");
             }
         });
+
+    }
+
+    private void total(){
+        BigDecimal total=new BigDecimal(0);
+        for (OrderDetailsTM item : tblOrderDetails.getItems()) {
+            total=total.add(item.getTotal());
+        }
+        lblTotal.setText(total.setScale(2).toString());
 
     }
 
@@ -165,7 +181,7 @@ public class PlaceOrderFormController {
         tblOrderDetails.getSelectionModel().clearSelection();
         cmbCustomerId.requestFocus();
         cmbItemCode.setDisable(false);
-
+        total();
     }
 
     private void loadAllItem() {
