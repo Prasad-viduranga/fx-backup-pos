@@ -12,8 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -31,8 +29,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
-
-import static javafx.scene.input.KeyEvent.KEY_PRESSED;
 
 public class PlaceOrderFormController {
 
@@ -162,12 +158,15 @@ public class PlaceOrderFormController {
 
     }
 
-    private void total(){
-        BigDecimal total=new BigDecimal(0);
+    private void total() {
+
+        BigDecimal total = tblOrderDetails.getItems().stream().map(details -> details.getTotal()).reduce((bigDecimal, bigDecimal2) -> bigDecimal.add(bigDecimal2)).orElse(new BigDecimal(0)).setScale(2);
+        lblTotal.setText(total.toString());
+        /*        BigDecimal total = new BigDecimal(0);
         for (OrderDetailsTM item : tblOrderDetails.getItems()) {
-            total=total.add(item.getTotal());
+            total = total.add(item.getTotal());
         }
-        lblTotal.setText(total.setScale(2).toString());
+        lblTotal.setText(total.setScale(2).toString());*/
 
     }
 
