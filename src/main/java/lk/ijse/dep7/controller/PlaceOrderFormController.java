@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class PlaceOrderFormController {
 
@@ -109,11 +110,28 @@ public class PlaceOrderFormController {
         cmbItemCode.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             txtQty.setDisable(newValue == null);
             btnAdd.setDisable(newValue == null);
+
             if (newValue != null) {
+//                Method 1
+//                int orderedQty = 0;
+//                for (OrderDetailsTM orderDetailsTM : tblOrderDetails.getItems()) {
+//                    if (orderDetailsTM.getCode().equals(newValue)) {
+//                        orderedQty = orderDetailsTM.getQty();
+//                    }
+//                }
+
                 try {
                     txtDescription.setText(itemService.findItem(newValue).getDescription());
                     txtUnitPrice.setText(String.valueOf(itemService.findItem(newValue).getUnitPrice().setScale(2)));
-                    txtQtyOnHand.setText(String.valueOf(itemService.findItem(newValue).getQty()));
+//                    Method 1
+//                    txtQtyOnHand.setText(String.valueOf(itemService.findItem(newValue).getQty()-orderedQty));
+
+//                    Method 2
+                    Optional<OrderDetailsTM> optOrderDetail = tblOrderDetails.getItems().stream().filter(details -> details.getCode().equals(newValue)).findFirst();
+
+                    txtQtyOnHand.setText((optOrderDetail.isPresent() ? itemService.findItem(newValue).getQty() - optOrderDetail.get().getQty() : itemService.findItem(newValue).getQty()) +"");
+
+
                 } catch (NotFoundException e) {
                     new Alert(Alert.AlertType.ERROR, "Failed to load the item description.").show();
 
@@ -166,18 +184,6 @@ public class PlaceOrderFormController {
         BigDecimal unitPrice = new BigDecimal(txtUnitPrice.getText());
         BigDecimal total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
 
-        for (OrderDetailsTM orderDetailsTM : tblOrderDetails.getItems()) {
-            if (orderDetailsTM.getCode().equals(code)) {
-                qty = orderDetailsTM.getQty() + qty;
-                total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
-                orderDetailsTM.setQty(qty);
-            }
-
-            tblOrderDetails.refresh();
-            cmbItemCode.requestFocus();
-            initUI();
-            return;
-        }
         if (!txtQty.getText().matches("\\d+") || Integer.parseInt(txtQty.getText()) <= 0
                 || Integer.parseInt(txtQty.getText()) > Integer.parseInt(txtQtyOnHand.getText())) {
             new Alert(Alert.AlertType.ERROR, "Invalid qty").show();
@@ -185,6 +191,21 @@ public class PlaceOrderFormController {
             txtQty.selectAll();
             return;
         }
+
+        for (OrderDetailsTM orderDetailsTM : tblOrderDetails.getItems()) {
+            if (orderDetailsTM.getCode().equals(code)) {
+                qty = orderDetailsTM.getQty() + qty;
+                total = unitPrice.multiply(new BigDecimal(qty)).setScale(2);
+                orderDetailsTM.setQty(qty);
+                orderDetailsTM.setTotal(total);
+
+                tblOrderDetails.refresh();
+                cmbItemCode.requestFocus();
+                initUI();
+                return;
+            }
+        }
+
         tblOrderDetails.getItems().add(new OrderDetailsTM(code, description, qty, unitPrice, total));
         initUI();
     }
