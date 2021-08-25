@@ -51,7 +51,7 @@ public class CustomerService {
         }
     }
 
-    private boolean existCustomer(String id) throws SQLException {
+    boolean existCustomer(String id) throws SQLException {
 
         PreparedStatement pstmExistCustomer = connection.prepareStatement("SELECT id FROM customer WHERE id=?");
         pstmExistCustomer.setString(1, id);
