@@ -17,6 +17,10 @@ public class OrderService {
 
     public Connection connection;
 
+    public OrderService(Connection connection) {
+        this.connection = connection;
+    }
+
     public void saveOrder(String orderId, LocalDate date, String customerId, List<OrderDetailsDTO> orderDetails) throws FailedOperationException, DuplicateIdentifierException, NotFoundException {
 
         CustomerService customerService = new CustomerService(connection);
@@ -59,30 +63,26 @@ public class OrderService {
             }
             connection.commit();
 
+        } catch (SQLException e) {
+            failedOperationExecutionContext(connection::rollback);
         } catch (Throwable t) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                throw new FailedOperationException("Failed to rollback the transaction ");
-            }
-            if (t instanceof DuplicateIdentifierException || t instanceof FailedOperationException || t instanceof NotFoundException) {
-
-                try {
-                    throw t;
-                } catch (SQLException e) {
-                    throw new FailedOperationException("Failed to save the order ");
-                }
-            } else {
-                throw new FailedOperationException("Failed to save the order");
-            }
-
+            failedOperationExecutionContext(connection::rollback);
+            throw t;
         } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                throw new FailedOperationException("Failed to save the order ");
-            }
+            failedOperationExecutionContext(() -> connection.setAutoCommit(true));
         }
     }
 
+    private void failedOperationExecutionContext(ExecutionContext context) throws FailedOperationException {
+        try {
+            context.execute();
+        } catch (SQLException e) {
+            throw new FailedOperationException("Failed to save the order ");
+        }
+    }
+
+    @FunctionalInterface
+    interface ExecutionContext {
+        void execute() throws SQLException;
+    }
 }

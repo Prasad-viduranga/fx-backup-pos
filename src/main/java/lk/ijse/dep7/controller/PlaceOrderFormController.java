@@ -18,10 +18,13 @@ import javafx.stage.Stage;
 import lk.ijse.dep7.dbutils.SingleConnectionDataSource;
 import lk.ijse.dep7.dto.CustomerDTO;
 import lk.ijse.dep7.dto.ItemDTO;
+import lk.ijse.dep7.dto.OrderDetailsDTO;
+import lk.ijse.dep7.exception.DuplicateIdentifierException;
 import lk.ijse.dep7.exception.FailedOperationException;
 import lk.ijse.dep7.exception.NotFoundException;
 import lk.ijse.dep7.service.CustomerService;
 import lk.ijse.dep7.service.ItemService;
+import lk.ijse.dep7.service.OrderService;
 import lk.ijse.dep7.util.OrderDetailsTM;
 
 import java.io.IOException;
@@ -29,6 +32,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PlaceOrderFormController {
 
@@ -46,6 +50,9 @@ public class PlaceOrderFormController {
     public Label lblDate;
     public Label lblTotal;
     public JFXButton btnAdd;
+    private String orderId = "OD001";
+
+    private OrderService orderService = new OrderService(SingleConnectionDataSource.getInstance().getConnection());
     private CustomerService customerService = new CustomerService(SingleConnectionDataSource.getInstance().getConnection());
     private ItemService itemService = new ItemService(SingleConnectionDataSource.getInstance().getConnection());
 
@@ -131,9 +138,7 @@ public class PlaceOrderFormController {
 
 //                    Method 2
                     Optional<OrderDetailsTM> optOrderDetail = tblOrderDetails.getItems().stream().filter(details -> details.getCode().equals(newValue)).findFirst();
-
                     txtQtyOnHand.setText((optOrderDetail.isPresent() ? itemService.findItem(newValue).getQty() - optOrderDetail.get().getQty() : itemService.findItem(newValue).getQty()) + "");
-
 
                 } catch (NotFoundException e) {
                     new Alert(Alert.AlertType.ERROR, "Failed to load the item description.").show();
@@ -257,6 +262,32 @@ public class PlaceOrderFormController {
     public void txtQty_OnAction(ActionEvent actionEvent) {
     }
 
-    public void btnPlaceOrder_OnAction(ActionEvent actionEvent) {
+    public void btnPlaceOrder_OnAction(ActionEvent actionEvent) throws FailedOperationException, DuplicateIdentifierException, NotFoundException {
+        try {
+            orderService.saveOrder(orderId, LocalDate.now(), cmbCustomerId.getValue(), tblOrderDetails.getItems().stream().map(tm -> new OrderDetailsDTO(tm.getCode(), tm.getQty(), tm.getUnitPrice())).collect(Collectors.toList()));
+            new Alert(Alert.AlertType.INFORMATION, "Order has been placed successfully").show();
+            /*Todo: Clear,generate new order id*/
+            generateOrderId();
+        } catch (FailedOperationException | DuplicateIdentifierException | NotFoundException e) {
+            new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+            throw e;
+        }
+    }
+
+    private String generateOrderId() {
+        int orderId = 0;
+        if (tblOrderDetails.getItems().isEmpty()) {
+            return "OD001";
+        } else {
+
+            for (int i = 0; i < tblOrderDetails.getItems().size(); i++) {
+                if (orderId < Integer.parseInt(tblOrderDetails.getItems().get(i).getCode().split("OD")[1])) {
+                    orderId = Integer.parseInt(tblOrderDetails.getItems().get(i).getCode().split("OD")[1]);
+                }
+            }
+            int newId = orderId + 1;
+            System.out.println(String.format("OD%03d", newId));
+            return String.format("OD%03d", newId);
+        }
     }
 }
