@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -19,17 +20,15 @@ import lk.ijse.dep7.service.OrderService;
 import lk.ijse.dep7.util.SearchOrderTM;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 
 public class SearchOrdersFormController {
 
+    private final OrderService orderService = new OrderService(SingleConnectionDataSource.getInstance().getConnection());
     public AnchorPane root;
     public TextField txtSearch;
     public TableView<SearchOrderTM> tblOrders;
-    private final OrderService orderService = new OrderService(SingleConnectionDataSource.getInstance().getConnection());
 
     public void initialize() throws FailedOperationException {
         tblOrders.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("orderID"));
@@ -44,6 +43,7 @@ public class SearchOrdersFormController {
         txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 loadAllOrders();
+
             } catch (FailedOperationException e) {
                 throw new RuntimeException(e);
             }

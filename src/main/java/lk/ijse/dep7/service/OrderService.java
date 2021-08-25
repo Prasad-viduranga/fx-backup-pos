@@ -25,15 +25,33 @@ public class OrderService {
         List<OrderDTO> orderList = new ArrayList<>();
 
         try {
-            PreparedStatement pstm = connection.prepareStatement("SELECT o.*, c.name, order_total.total FROM `order` o INNER JOIN customer c on o.customer_id = c.id\n" +
+            String[] searchWord = query.split("\\s");
+            String sql = "SELECT o.*, c.name, order_total.total FROM `order` o INNER JOIN customer c on o.customer_id = c.id\n" +
                     "INNER JOIN\n" +
                     "(SELECT order_id, SUM(qty * unit_price) AS total FROM order_detail od GROUP BY  order_id) AS order_total\n" +
-                    "ON o.id = order_total.order_id WHERE order_id LIKE ? OR date LIKE ? OR customer_id LIKE ? OR name LIKE ? ;");
+                    "ON o.id = order_total.order_id WHERE order_id LIKE ? OR date LIKE ? OR customer_id LIKE ? OR name LIKE ? ";
 
-            pstm.setString(1, "%" + query + "%");
-            pstm.setString(2, "%" + query + "%");
-            pstm.setString(3, "%" + query + "%");
-            pstm.setString(4, "%" + query + "%");
+            for (int i = 1; i < searchWord.length; i++) {
+                String condition = "AND (order_id LIKE ? OR date LIKE ? OR customer_id LIKE ? OR name LIKE ? )";
+                sql += condition;
+            }
+            sql += ";";
+            System.out.println(searchWord[0]);
+
+            PreparedStatement pstm = connection.prepareStatement(sql);
+
+            int j = 0;
+
+            for (int i = 1; i <= searchWord.length * 4; i++) {
+                pstm.setString(i, "%" + searchWord[j] + "%");
+                if (i % 4 == 0) j++;
+            }
+
+
+//            pstm.setString(1, "%" + query + "%");
+//            pstm.setString(2, "%" + query + "%");
+//            pstm.setString(3, "%" + query + "%");
+//            pstm.setString(4, "%" + query + "%");
             ResultSet rst = pstm.executeQuery();
 
             while (rst.next()) {

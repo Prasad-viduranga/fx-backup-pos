@@ -45,4 +45,5 @@ INNER JOIN order_detail od ON o.id = od.order_id GROUP BY od.order_id;
 SELECT o.*, c.name, order_total.total FROM `order` o INNER JOIN customer c on o.customer_id = c.id
 INNER JOIN
 (SELECT order_id, SUM(qty * unit_price) AS total FROM order_detail od GROUP BY  order_id) AS order_total
-ON o.id = order_total.order_id WHERE order_id LIKE '%OD001%'OR date LIKE '%OD001%' OR customer_id LIKE '%OD001%' OR name LIKE '%OD001%';
+ON o.id = order_total.order_id WHERE order_id LIKE '%OD001%'OR date LIKE '%OD001%' OR customer_id LIKE '%OD001%' OR name LIKE '%OD001%'
+AND (order_id LIKE ? OR date LIKE ? OR customer_id LIKE ? OR name LIKE ? );"
