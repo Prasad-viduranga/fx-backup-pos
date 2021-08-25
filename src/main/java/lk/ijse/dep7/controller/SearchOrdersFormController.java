@@ -5,21 +5,70 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import lk.ijse.dep7.dbutils.SingleConnectionDataSource;
+import lk.ijse.dep7.dto.OrderDTO;
+import lk.ijse.dep7.exception.FailedOperationException;
+import lk.ijse.dep7.service.OrderService;
+import lk.ijse.dep7.util.SearchOrderTM;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.List;
 
 public class SearchOrdersFormController {
 
     public AnchorPane root;
     public TextField txtSearch;
-    public TableView tblOrders;
+    public TableView<SearchOrderTM> tblOrders;
+    private final OrderService orderService = new OrderService(SingleConnectionDataSource.getInstance().getConnection());
 
+    public void initialize() throws FailedOperationException {
+        tblOrders.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("orderID"));
+        tblOrders.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("date"));
+        tblOrders.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("customerID"));
+        tblOrders.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("customerName"));
+        tblOrders.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("total"));
+
+
+        loadAllOrders();
+
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                loadAllOrders();
+            } catch (FailedOperationException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+    }
+
+
+    public void loadAllOrders() throws FailedOperationException {
+
+        try {
+            List<OrderDTO> orderList = orderService.searchOrder(txtSearch.getText());
+            tblOrders.getItems().clear();
+
+            orderList.forEach(order -> tblOrders.getItems().add(new SearchOrderTM(order.getOrderId(),
+                    order.getOrderDate(),
+                    order.getCustomerId(),
+                    order.getCustomerName(),
+                    order.getOrderTotal().setScale(2))));
+
+        } catch (FailedOperationException e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to fetch orders").show();
+            throw e;
+        }
+    }
 
     @FXML
     private void navigateToHome(MouseEvent event) throws IOException {
