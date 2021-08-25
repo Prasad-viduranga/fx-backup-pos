@@ -15,7 +15,7 @@ import java.util.List;
 
 public class OrderService {
 
-    public Connection connection;
+    public final Connection connection;
 
     public OrderService(Connection connection) {
         this.connection = connection;
@@ -26,10 +26,10 @@ public class OrderService {
         CustomerService customerService = new CustomerService(connection);
         ItemService itemService = new ItemService(connection);
         try {
-            PreparedStatement pstm = connection.prepareStatement("SELECT id FROM `order` WHERE id=?");
-            pstm.setString(1, orderId);
+            PreparedStatement stm = connection.prepareStatement("SELECT id FROM `order` WHERE id=?");
+            stm.setString(1, orderId);
 
-            if (pstm.executeQuery().next()) {
+            if (stm.executeQuery().next()) {
                 throw new DuplicateIdentifierException(orderId + " already exists");
             }
             if (!customerService.existCustomer(customerId)) {
@@ -37,23 +37,23 @@ public class OrderService {
             }
 
             connection.setAutoCommit(false);
-            pstm = connection.prepareStatement("INSERT INTO `order` (id, date, customer_id) VALUES (?,?,?)");
-            pstm.setString(1, orderId);
-            pstm.setDate(2, Date.valueOf(date));
-            pstm.setString(3, customerId);
+            stm = connection.prepareStatement("INSERT INTO `order` (id, date, customer_id) VALUES (?,?,?)");
+            stm.setString(1, orderId);
+            stm.setDate(2, Date.valueOf(date));
+            stm.setString(3, customerId);
 
-            if (pstm.executeUpdate() != 1) {
+            if (stm.executeUpdate() != 1) {
                 throw new FailedOperationException("Failed to save the order");
             }
-            pstm = connection.prepareStatement("INSERT INTO order_detail (order_id, item_code, unit_price, qty) VALUES (?,?,?,?)");
+            stm = connection.prepareStatement("INSERT INTO order_detail (order_id, item_code, unit_price, qty) VALUES (?,?,?,?)");
 
             for (OrderDetailsDTO orderDetailsDTO : orderDetails) {
-                pstm.setString(1, orderId);
-                pstm.setString(2, orderDetailsDTO.getItemCode());
-                pstm.setBigDecimal(3, orderDetailsDTO.getUnitPrice());
-                pstm.setInt(4, orderDetailsDTO.getQty());
+                stm.setString(1, orderId);
+                stm.setString(2, orderDetailsDTO.getItemCode());
+                stm.setBigDecimal(3, orderDetailsDTO.getUnitPrice());
+                stm.setInt(4, orderDetailsDTO.getQty());
 
-                if (pstm.executeUpdate() != 1) {
+                if (stm.executeUpdate() != 1) {
                     throw new FailedOperationException("Failed to save the order");
                 }
 
