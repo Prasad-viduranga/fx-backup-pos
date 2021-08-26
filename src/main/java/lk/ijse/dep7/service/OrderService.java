@@ -46,8 +46,7 @@ public class OrderService {
                 pstm.setString(i, "%" + searchWord[j] + "%");
                 if (i % 4 == 0) j++;
             }
-
-
+            
 //            pstm.setString(1, "%" + query + "%");
 //            pstm.setString(2, "%" + query + "%");
 //            pstm.setString(3, "%" + query + "%");
@@ -64,6 +63,30 @@ public class OrderService {
             throw new FailedOperationException("Failed to search operation");
         }
 
+    }
+    
+    public List<OrderDetailsDTO> findOrderDetails(String orderId) throws NotFoundException, FailedOperationException {
+        List<OrderDetailsDTO> orderDetailsList=new ArrayList<>();
+        
+        try {
+            PreparedStatement pstm = connection.prepareStatement("SELECT id FROM `order` WHERE id=?");
+            pstm.setString(1,orderId);
+            
+            if (!pstm.executeQuery().next()) throw new NotFoundException("Invalid order Id");
+            pstm=connection.prepareStatement("SELECT * FROM order_detail WHERE order_id=?");
+            pstm.setString(1,orderId);
+            ResultSet rst = pstm.executeQuery();
+            
+            while (rst.next()){
+                orderDetailsList.add(new OrderDetailsDTO(rst.getString("item_code"),rst.getInt("qty"),
+                        rst.getBigDecimal("unit_price")));
+                
+            }
+            return orderDetailsList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new FailedOperationException("Failed to fetch order details for order id: "+orderId);
+        }
     }
 
     public String generateOrderId() throws FailedOperationException {
