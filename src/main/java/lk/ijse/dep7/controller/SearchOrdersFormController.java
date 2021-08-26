@@ -9,7 +9,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -81,6 +80,17 @@ public class SearchOrdersFormController {
         Platform.runLater(() -> primaryStage.sizeToScene());
     }
 
-    public void tblOrders_OnMouseClicked(MouseEvent mouseEvent) {
+    public void tblOrders_OnMouseClicked(MouseEvent mouseEvent) throws IOException {
+        if (tblOrders.getSelectionModel().getSelectedItem() == null) {
+            return;
+        }
+        if ((mouseEvent.getClickCount() == 2) && (tblOrders.getSelectionModel().getSelectedItem() != null)) {
+            Stage stage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("/view/view-order-form.fxml"));
+            stage.setScene(new Scene(fxmlLoader.load()));
+            stage.show();
+            stage.centerOnScreen();
+            stage.sizeToScene();
+        }
     }
 }
